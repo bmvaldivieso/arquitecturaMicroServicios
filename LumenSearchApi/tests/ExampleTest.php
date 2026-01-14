@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests;
+use Laravel\Lumen\Testing\TestCase;
 
-class ExampleTest extends BrowserKitTestCase
+class ExampleTest extends TestCase
 {
     /**
      * A basic test example.
@@ -21,7 +21,7 @@ class ExampleTest extends BrowserKitTestCase
      */
     public function test_search_endpoint_returns_success()
     {
-        $response = $this->call('GET', '/search?q=test');
+        $response = $this->get('/search?q=test');
         
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -33,7 +33,7 @@ class ExampleTest extends BrowserKitTestCase
      */
     public function test_search_suggestions_endpoint()
     {
-        $response = $this->call('GET', '/search/suggestions?q=test');
+        $response = $this->get('/search/suggestions?q=test');
         
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -45,7 +45,7 @@ class ExampleTest extends BrowserKitTestCase
      */
     public function test_popular_searches_endpoint()
     {
-        $response = $this->call('GET', '/search/popular');
+        $response = $this->get('/search/popular');
         
         $this->assertEquals(200, $response->getStatusCode());
     }
