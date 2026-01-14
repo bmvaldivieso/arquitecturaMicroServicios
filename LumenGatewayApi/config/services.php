@@ -10,4 +10,14 @@ return [
         'base_uri' => env('BOOKS_SERVICE_BASE_URL'),
         'secret' => env('BOOKS_SERVICE_SECRET'),
     ],
+
+    'reviews' => [
+        'base_uri' => env('REVIEWS_SERVICE_BASE_URL'),
+        'secret' => env('REVIEWS_SERVICE_SECRET'),
+    ],
+
+    'search' => [
+        'base_uri' => env('SEARCH_SERVICE_BASE_URL'),
+        'secret' => env('SEARCH_SERVICE_SECRET'),
+    ],
 ];

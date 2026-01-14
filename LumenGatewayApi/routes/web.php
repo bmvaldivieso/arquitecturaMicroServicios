@@ -30,3 +30,22 @@
     $router->put('/books/{book}', 'BookController@update');
     $router->patch('/books/{book}', 'BookController@update');
     $router->delete('/books/{book}', 'BookController@destroy');
+
+    /**
+     * Reviews routes
+     */
+    $router->get('/reviews', 'ReviewController@index');
+    $router->post('/reviews', 'ReviewController@store');
+    $router->get('/reviews/{review}', 'ReviewController@show');
+    $router->put('/reviews/{review}', 'ReviewController@update');
+    $router->patch('/reviews/{review}', 'ReviewController@update');
+    $router->delete('/reviews/{review}', 'ReviewController@destroy');
+
+    /**
+     * Search routes
+     */
+    $router->get('/search', 'SearchController@search');
+    $router->get('/search/books', 'SearchController@searchBooks');
+    $router->get('/search/authors', 'SearchController@searchAuthors');
+    $router->get('/search/suggestions', 'SearchController@suggestions');
+    $router->get('/search/popular', 'SearchController@popular');

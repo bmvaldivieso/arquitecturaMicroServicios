@@ -1,0 +1,28 @@
+# Bases de datos SQLite
+database/*.sqlite
+
+# Archivos de entorno (variables sensibles)
+*/.env
+.env
+.env.*
+!.env.example
+
+# Archivos temporales y de cache
+*.log
+.phpunit.result.cache
+.phpunit.cache
+
+# IDEs y editores
+/.idea
+.vscode/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Dependencias (se manejan por composer)
+*/vendor/
+composer.lock

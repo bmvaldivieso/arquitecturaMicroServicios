@@ -14,6 +14,8 @@ cache:
     - .composer-cache/
     - LumenAuthorsApi/vendor/
     - LumenBooksApi/vendor/
+    - LumenReviewsApi/vendor/
+    - LumenSearchApi/vendor/
     - LumenGatewayApi/vendor/
 
 # Template para servicios PHP
@@ -63,6 +65,34 @@ validate-gateway:
   stage: validate
   script:
     - cd LumenGatewayApi
+    - composer validate --no-check-publish
+    - composer install --prefer-dist --no-progress --no-interaction
+    - find app -name "*.php" -exec php -l {} \;
+  only:
+    - merge_requests
+    - main
+    - master
+    - develop
+
+validate-reviews:
+  <<: *php-service-template
+  stage: validate
+  script:
+    - cd LumenReviewsApi
+    - composer validate --no-check-publish
+    - composer install --prefer-dist --no-progress --no-interaction
+    - find app -name "*.php" -exec php -l {} \;
+  only:
+    - merge_requests
+    - main
+    - master
+    - develop
+
+validate-search:
+  <<: *php-service-template
+  stage: validate
+  script:
+    - cd LumenSearchApi
     - composer validate --no-check-publish
     - composer install --prefer-dist --no-progress --no-interaction
     - find app -name "*.php" -exec php -l {} \;
@@ -145,12 +175,71 @@ test-gateway:
     DB_DATABASE: ":memory:"
     AUTHORS_SERVICE_BASE_URL: http://localhost:8001
     BOOKS_SERVICE_BASE_URL: http://localhost:8002
+    REVIEWS_SERVICE_BASE_URL: http://localhost:8003
+    SEARCH_SERVICE_BASE_URL: http://localhost:8013
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
       junit: LumenGatewayApi/tests/results.xml
     paths:
       - LumenGatewayApi/coverage/
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - master
+    - develop
+
+test-reviews:
+  <<: *php-service-template
+  stage: test
+  script:
+    - cd LumenReviewsApi
+    - composer install --prefer-dist --no-progress --no-interaction
+    - php artisan migrate --force
+    - vendor/bin/phpunit
+  environment:
+    name: testing
+  variables:
+    APP_ENV: testing
+    DB_CONNECTION: sqlite
+    DB_DATABASE: ":memory:"
+    BOOKS_SERVICE_BASE_URL: http://localhost:8002
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      junit: LumenReviewsApi/tests/results.xml
+    paths:
+      - LumenReviewsApi/coverage/
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - master
+    - develop
+
+test-search:
+  <<: *php-service-template
+  stage: test
+  script:
+    - cd LumenSearchApi
+    - composer install --prefer-dist --no-progress --no-interaction
+    - php artisan migrate --force
+    - vendor/bin/phpunit
+  environment:
+    name: testing
+  variables:
+    APP_ENV: testing
+    DB_CONNECTION: sqlite
+    DB_DATABASE: ":memory:"
+    AUTHORS_SERVICE_BASE_URL: http://localhost:8001
+    BOOKS_SERVICE_BASE_URL: http://localhost:8002
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      junit: LumenSearchApi/tests/results.xml
+    paths:
+      - LumenSearchApi/coverage/
     expire_in: 1 week
   only:
     - merge_requests
@@ -169,15 +258,21 @@ integration-tests:
     # Instalar dependencias para todos los servicios
     - cd LumenAuthorsApi && composer install --prefer-dist --no-progress --no-interaction
     - cd ../LumenBooksApi && composer install --prefer-dist --no-progress --no-interaction
+    - cd ../LumenReviewsApi && composer install --prefer-dist --no-progress --no-interaction
+    - cd ../LumenSearchApi && composer install --prefer-dist --no-progress --no-interaction
     - cd ../LumenGatewayApi && composer install --prefer-dist --no-progress --no-interaction
     
     # Ejecutar migraciones
     - cd LumenAuthorsApi && php artisan migrate --force
     - cd ../LumenBooksApi && php artisan migrate --force
+    - cd ../LumenReviewsApi && php artisan migrate --force
+    - cd ../LumenSearchApi && php artisan migrate --force
     
     # Iniciar servicios en background
     - cd LumenAuthorsApi && php -S localhost:8001 -t public > /tmp/authors.log 2>&1 &
     - cd LumenBooksApi && php -S localhost:8002 -t public > /tmp/books.log 2>&1 &
+    - cd LumenReviewsApi && php -S localhost:8003 -t public > /tmp/reviews.log 2>&1 &
+    - cd LumenSearchApi && php -S localhost:8013 -t public > /tmp/search.log 2>&1 &
     - cd LumenGatewayApi && php -S localhost:8000 -t public > /tmp/gateway.log 2>&1 &
     
     # Esperar a que los servicios estén listos
@@ -186,15 +281,19 @@ integration-tests:
     # Verificar que los servicios responden
     - curl -f http://localhost:8001/authors || (cat /tmp/authors.log && exit 1)
     - curl -f http://localhost:8002/books || (cat /tmp/books.log && exit 1)
+    - curl -f http://localhost:8003/reviews || (cat /tmp/reviews.log && exit 1)
+    - curl -f http://localhost:8013/search || (cat /tmp/search.log && exit 1)
     - curl -f http://localhost:8000/authors || (cat /tmp/gateway.log && exit 1)
     
     # Ejecutar pruebas de integración
-    - chmod +x test_gateway_simple.sh
-    - bash test_gateway_simple.sh || true
+    - chmod +x test_all_services.sh
+    - bash test_all_services.sh || true
     
     # Limpiar procesos
     - pkill -f "php -S localhost:8001" || true
     - pkill -f "php -S localhost:8002" || true
+    - pkill -f "php -S localhost:8003" || true
+    - pkill -f "php -S localhost:8013" || true
     - pkill -f "php -S localhost:8000" || true
   artifacts:
     when: always
