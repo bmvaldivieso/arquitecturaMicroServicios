@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-class ExampleTest extends TestCase
+class ExampleTest extends BrowserKitTestCase
 {
     /**
      * A basic test example.
@@ -21,9 +21,9 @@ class ExampleTest extends TestCase
      */
     public function test_search_endpoint_returns_success()
     {
-        $response = $this->get('/search?q=test');
+        $response = $this->call('GET', '/search?q=test');
         
-        $this->assertEquals(200, $response->response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
@@ -33,9 +33,9 @@ class ExampleTest extends TestCase
      */
     public function test_search_suggestions_endpoint()
     {
-        $response = $this->get('/search/suggestions?q=test');
+        $response = $this->call('GET', '/search/suggestions?q=test');
         
-        $this->assertEquals(200, $response->response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
@@ -45,8 +45,8 @@ class ExampleTest extends TestCase
      */
     public function test_popular_searches_endpoint()
     {
-        $response = $this->get('/search/popular');
+        $response = $this->call('GET', '/search/popular');
         
-        $this->assertEquals(200, $response->response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }
