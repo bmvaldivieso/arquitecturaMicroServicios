@@ -1,9 +1,19 @@
 <?php
 
-use Laravel\Lumen\Testing\TestCase;
+use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
-class ExampleTest extends TestCase
+class ExampleTest extends BaseTestCase
 {
+    /**
+     * Creates the application.
+     *
+     * @return \Laravel\Lumen\Application
+     */
+    public function createApplication()
+    {
+        return require __DIR__.'/../bootstrap/app.php';
+    }
+
     /**
      * A basic test example.
      *
