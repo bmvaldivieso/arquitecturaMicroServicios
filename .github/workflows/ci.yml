@@ -172,6 +172,14 @@ jobs:
           find app -name "*.php" -exec php -l {} \;
         working-directory: ./LumenSearchApi
       
+      - name: Run migrations
+        run: php artisan migrate --force
+        working-directory: ./LumenSearchApi
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+      
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
         working-directory: ./LumenSearchApi
@@ -181,14 +189,6 @@ jobs:
           DB_DATABASE: ":memory:"
           AUTHORS_SERVICE_BASE_URL: http://localhost:8001
           BOOKS_SERVICE_BASE_URL: http://localhost:8002
-      
-      - name: Run migrations
-        run: php artisan migrate --force
-        working-directory: ./LumenSearchApi
-        env:
-          APP_ENV: testing
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
 
   # Job para el Gateway
   gateway-service:
