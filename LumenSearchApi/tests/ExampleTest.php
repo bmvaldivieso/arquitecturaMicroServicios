@@ -31,9 +31,9 @@ class ExampleTest extends BaseTestCase
      */
     public function test_search_endpoint_returns_success()
     {
-        $response = $this->get('/search?q=test');
+        $this->get('/search?q=test');
         
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseStatus(200);
     }
 
     /**
@@ -43,9 +43,9 @@ class ExampleTest extends BaseTestCase
      */
     public function test_search_suggestions_endpoint()
     {
-        $response = $this->get('/search/suggestions?q=test');
+        $this->get('/search/suggestions?q=test');
         
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseStatus(200);
     }
 
     /**
@@ -55,8 +55,8 @@ class ExampleTest extends BaseTestCase
      */
     public function test_popular_searches_endpoint()
     {
-        $response = $this->get('/search/popular');
+        $this->get('/search/popular');
         
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseStatus(200);
     }
 }
