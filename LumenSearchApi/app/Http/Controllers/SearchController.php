@@ -41,30 +41,6 @@ class SearchController extends Controller
      */
     public function search(Request $request)
     {
-        // ✅ MODO TESTING - Evitar llamadas externas en CI
-        if (app()->environment('testing')) {
-            return $this->successResponse([
-                'data' => [],
-                'books' => [],
-                'authors' => [],
-                'total_books' => 0,
-                'total_authors' => 0,
-                'query' => $request->get('q', ''),
-                'filters' => [
-                    'category' => $request->get('category'),
-                    'price_min' => $request->get('price_min'),
-                    'price_max' => $request->get('price_max'),
-                    'rating_min' => $request->get('rating_min'),
-                    'sort' => $request->get('sort', 'relevance')
-                ],
-                'pagination' => [
-                    'page' => 1,
-                    'limit' => 10,
-                    'total_pages' => 0
-                ]
-            ]);
-        }
-
         $query = $request->get('q', '');
         $category = $request->get('category');
         $price_min = $request->get('price_min');
@@ -74,8 +50,33 @@ class SearchController extends Controller
         $page = max(1, (int)$request->get('page', 1));
         $limit = min(50, max(1, (int)$request->get('limit', 10)));
 
+        // 1️⃣ Validación obligatoria (SIEMPRE primero)
         if (empty($query) && empty($category)) {
             return $this->errorResponse('Query or category parameter is required', Response::HTTP_BAD_REQUEST);
+        }
+
+        // 2️⃣ MODO TESTING - Evitar llamadas externas en CI
+        if (app()->environment('testing')) {
+            return $this->successResponse([
+                'data' => [],
+                'books' => [],
+                'authors' => [],
+                'total_books' => 0,
+                'total_authors' => 0,
+                'query' => $query,
+                'filters' => [
+                    'category' => $category,
+                    'price_min' => $price_min,
+                    'price_max' => $price_max,
+                    'rating_min' => $rating_min,
+                    'sort' => $sort
+                ],
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total_pages' => 0
+                ]
+            ]);
         }
 
         try {
